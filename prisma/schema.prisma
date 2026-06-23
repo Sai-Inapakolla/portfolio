@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Bio {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  location  String
+  latitude  Float
+  longitude Float
+  tagline   String
+}
+
+model Project {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String   @unique
+  title       String
+  description String
+  longDescription String?
+  image       String
+  githubUrl   String?
+  liveUrl     String?
+  tags        String   // JSON string or comma-separated
+  features    String?  // JSON string
+  role        String?
+  status      String?
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Skill {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  category    String   
+  icon        String   
+  color       String?
+  proficiency Int?
+}
+
+model Achievement {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  date        String
+  description String
+}
+
+model Certification {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  issuer      String
+  date        String
+  link        String?
+}
+
+model ContactMessage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
