@@ -173,7 +173,7 @@ export default function HeroSection() {
             flexWrap: "wrap",
           }}
         >
-          <a href="https://drive.google.com/file/d/1DqjPG0PLoLbPh85jPIRQWt5xvtlV3o4T/view?usp=sharing" className="pill-btn pill-btn--cyan">
+          <a href="https://drive.google.com/file/d/1kDISAOLHfjuPyAmaFAbOIORu_CgCQ2HT/view?usp=sharing" className="pill-btn pill-btn--cyan">
             <span className="pill-btn-shine" />
             <svg
               width="14"
