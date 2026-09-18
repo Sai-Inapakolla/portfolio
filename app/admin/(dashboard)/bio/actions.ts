@@ -10,6 +10,16 @@ export async function saveBioAction(formData: FormData) {
   const latitude = parseFloat(formData.get("latitude") as string);
   const longitude = parseFloat(formData.get("longitude") as string);
   const tagline = formData.get("tagline") as string;
+  const longBio = (formData.get("longBio") as string) || null;
+  const statusText = (formData.get("statusText") as string) || null;
+  const originStory = (formData.get("originStory") as string) || null;
+  const currentFocus = (formData.get("currentFocus") as string) || null;
+  const philosophy = (formData.get("philosophy") as string) || null;
+  const resumeUrl = (formData.get("resumeUrl") as string) || null;
+  const email = (formData.get("email") as string) || null;
+  const githubUrl = (formData.get("githubUrl") as string) || null;
+  const linkedinUrl = (formData.get("linkedinUrl") as string) || null;
+  const instagramUrl = (formData.get("instagramUrl") as string) || null;
 
   const data = {
     content,
@@ -17,6 +27,16 @@ export async function saveBioAction(formData: FormData) {
     latitude: isNaN(latitude) ? 0 : latitude,
     longitude: isNaN(longitude) ? 0 : longitude,
     tagline,
+    longBio,
+    statusText,
+    originStory,
+    currentFocus,
+    philosophy,
+    resumeUrl,
+    email,
+    githubUrl,
+    linkedinUrl,
+    instagramUrl,
   };
 
   if (id) {
@@ -29,3 +49,4 @@ export async function saveBioAction(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/about");
 }
+

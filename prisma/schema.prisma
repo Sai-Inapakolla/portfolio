@@ -13,12 +13,22 @@ datasource db {
 }
 
 model Bio {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  content   String
-  location  String
-  latitude  Float
-  longitude Float
-  tagline   String
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  content      String
+  location     String
+  latitude     Float
+  longitude    Float
+  tagline      String
+  longBio      String?
+  statusText   String?
+  originStory  String?
+  currentFocus String?
+  philosophy   String?
+  resumeUrl    String?
+  email        String?
+  githubUrl    String?
+  linkedinUrl  String?
+  instagramUrl String?
 }
 
 model Project {

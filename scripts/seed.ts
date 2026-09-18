@@ -33,11 +33,11 @@ async function main() {
     console.log('Seeding skills...');
     for (const skill of SKILLS) {
       const svgString = renderToString(skill.svg as any);
-      
+
       const existing = await prisma.skill.findFirst({
         where: { name: skill.name }
       });
-      
+
       if (!existing) {
         await prisma.skill.create({
           data: {

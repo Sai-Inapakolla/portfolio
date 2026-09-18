@@ -1,14 +1,19 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { prisma } from "@/lib/prisma";
 import AboutContactClient from "./AboutContactClient";
 
 export const metadata: Metadata = {
-  title: "About & Contact | Portfolio",
+  title: "About & Persona | Inapakolla Sai",
   description:
-    "Learn more about Inapakolla Sai — a B.Tech CSE (AI & ML) student passionate about full-stack development. Get in touch via email, GitHub, or LinkedIn.",
+    "Explore Inapakolla Sai's journey, engineering philosophy, timeline, and technical specializations in Full-Stack Web Engineering and AI/ML.",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const bio = await prisma.bio.findFirst();
+  const achievements = await prisma.achievement.findMany().catch(() => []);
+  const certifications = await prisma.certification.findMany().catch(() => []);
+
   return (
     <main className="project-page">
       {/* ── Back navigation ── */}
@@ -37,18 +42,18 @@ export default function AboutPage() {
           className="project-hero-glow"
           style={{
             background:
-              "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(167,139,250,0.12), transparent 70%)",
+              "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(167,139,250,0.14), transparent 70%)",
           }}
         />
         <div className="project-hero-grid" />
 
         <div className="project-hero-content" style={{ textAlign: "center" }}>
-          <p className="section-label">Personal</p>
+          <p className="section-label">Persona · Journey · Philosophy</p>
           <h1
             className="project-title font-display"
             style={{ marginBottom: 12 }}
           >
-            About & Contact
+            About &amp; Story
           </h1>
           <div
             className="project-accent-bar"
@@ -60,15 +65,20 @@ export default function AboutPage() {
           />
           <p
             className="project-subtitle"
-            style={{ maxWidth: 520, margin: "0 auto" }}
+            style={{ maxWidth: 580, margin: "0 auto" }}
           >
-            Who I am, where I&apos;m based, how I work, and how to reach me.
+            An inside look into my story, engineering values, learning timeline, and full-stack development journey.
           </p>
         </div>
       </section>
 
       {/* Client-side interactive sections */}
-      <AboutContactClient />
+      <AboutContactClient
+        bio={bio}
+        achievements={achievements}
+        certifications={certifications}
+      />
     </main>
   );
 }
+
