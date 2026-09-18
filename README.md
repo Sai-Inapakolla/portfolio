@@ -44,40 +44,6 @@ A modern, responsive developer portfolio showcasing my projects, technical skill
 
 ---
 
-## 📸 Screenshots
-
-(Add screenshots here)
-
----
-
-## 🚀 Getting Started
-
-Clone the repository
-
-```bash
-git clone https://github.com/Sai-Inapakolla/portfolio.git
-```
-
-Install dependencies
-
-```bash
-npm install
-```
-
-Run the development server
-
-```bash
-npm run dev
-```
-
-Open
-
-```
-http://localhost:3000
-```
-
----
-
 ## 📬 Contact
 
 **Sai Inapakolla**
