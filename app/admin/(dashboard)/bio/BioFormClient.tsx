@@ -1,74 +1,121 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useState } from "react";
 import type { Bio } from "@prisma/client";
-import { saveBioAction } from "./actions";
 
 interface Props {
   bio: Bio | null;
 }
 
 export default function BioFormClient({ bio }: Props) {
-  const [state, formAction, isPending] = useActionState(saveBioAction, null);
-  const [showToast, setShowToast] = useState(false);
+  const [formData, setFormData] = useState({
+    tagline: bio?.tagline || "",
+    content: bio?.content || "",
+    location: bio?.location || "",
+    latitude: bio?.latitude ?? 22.30716,
+    longitude: bio?.longitude ?? 73.18122,
+    statusText: bio?.statusText || "Open to Opportunities & Collaborations",
+    longBio: bio?.longBio || "",
+    originStory: bio?.originStory || "",
+    currentFocus: bio?.currentFocus || "",
+    philosophy: bio?.philosophy || "",
+    resumeUrl: bio?.resumeUrl || "/Sai_Inapakolla_Resume.pdf",
+    email: bio?.email || "inapakolla.sai1@gmail.com",
+    githubUrl: bio?.githubUrl || "https://github.com/Sai-Inapakolla",
+    linkedinUrl: bio?.linkedinUrl || "https://www.linkedin.com/in/saiinapakolla576/",
+    instagramUrl: bio?.instagramUrl || "https://www.instagram.com/inapakolla.sai",
+  });
 
-  useEffect(() => {
-    if (state?.success) {
-      setShowToast(true);
-      const timer = setTimeout(() => setShowToast(false), 4000);
-      return () => clearTimeout(timer);
+  const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setFeedback(null);
+
+    try {
+      const res = await fetch("/api/admin/bio", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setFeedback({
+          type: "success",
+          message: "All changes saved successfully!",
+        });
+        // Auto dismiss success toast after 4s
+        setTimeout(() => {
+          setFeedback((prev) => (prev?.type === "success" ? null : prev));
+        }, 4000);
+      } else {
+        setFeedback({
+          type: "error",
+          message: data.error || "Failed to save changes. Please try again.",
+        });
+      }
+    } catch (err: any) {
+      console.error("Save error:", err);
+      setFeedback({
+        type: "error",
+        message: err.message || "Network error. Please check your connection.",
+      });
+    } finally {
+      setLoading(false);
     }
-  }, [state]);
+  };
 
   return (
-    <form action={formAction} style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-      {bio && <input type="hidden" name="id" value={bio.id} />}
-
-      {/* Success Notification Banner */}
-      {showToast && (
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+      {/* ── Status Feedback Banner ── */}
+      {feedback && (
         <div
           style={{
             padding: "16px 20px",
             borderRadius: 12,
-            background: "rgba(16, 185, 129, 0.12)",
-            border: "1px solid rgba(16, 185, 129, 0.4)",
-            color: "var(--emerald)",
+            background:
+              feedback.type === "success"
+                ? "rgba(16, 185, 129, 0.14)"
+                : "rgba(244, 63, 94, 0.14)",
+            border: `1px solid ${
+              feedback.type === "success"
+                ? "rgba(16, 185, 129, 0.4)"
+                : "rgba(244, 63, 94, 0.4)"
+            }`,
+            color:
+              feedback.type === "success"
+                ? "var(--emerald)"
+                : "var(--rose)",
             display: "flex",
             alignItems: "center",
             gap: 12,
-            fontSize: "0.9rem",
+            fontSize: "0.92rem",
             fontWeight: 600,
-            animation: "fadeIn 0.3s ease",
           }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-          <span>{state?.message || "All changes saved successfully!"}</span>
-        </div>
-      )}
-
-      {/* Error Banner */}
-      {state && !state.success && (
-        <div
-          style={{
-            padding: "16px 20px",
-            borderRadius: 12,
-            background: "rgba(244, 63, 94, 0.12)",
-            border: "1px solid rgba(244, 63, 94, 0.4)",
-            color: "var(--rose)",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            fontSize: "0.9rem",
-          }}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          <span>{state.message}</span>
+          {feedback.type === "success" ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          )}
+          <span>{feedback.message}</span>
         </div>
       )}
 
@@ -77,13 +124,13 @@ export default function BioFormClient({ bio }: Props) {
           ═══════════════════════════════════════════ */}
       <div className="glass-card" style={{ padding: 28 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-          <span style={{ fontSize: "1.1rem" }}>🏠</span>
+          <span style={{ fontSize: "1.2rem" }}>🏠</span>
           <div>
             <h2 className="font-display" style={{ fontSize: "1.15rem", fontWeight: 700 }}>
               1. Homepage About Section (`/#about`)
             </h2>
             <p style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-              Displayed directly on the main landing page.
+              Displayed on the main portfolio landing page.
             </p>
           </div>
         </div>
@@ -97,9 +144,9 @@ export default function BioFormClient({ bio }: Props) {
               type="text"
               id="tagline"
               name="tagline"
-              defaultValue={bio?.tagline || ""}
+              value={formData.tagline}
+              onChange={handleChange}
               placeholder="e.g. Where curiosity meets passion"
-              required
               className="admin-input"
             />
           </div>
@@ -111,9 +158,9 @@ export default function BioFormClient({ bio }: Props) {
             <textarea
               id="content"
               name="content"
-              defaultValue={bio?.content || ""}
+              value={formData.content}
+              onChange={handleChange}
               placeholder="Short bio summary displayed on homepage card..."
-              required
               rows={5}
               className="admin-input"
             />
@@ -127,9 +174,9 @@ export default function BioFormClient({ bio }: Props) {
               type="text"
               id="location"
               name="location"
-              defaultValue={bio?.location || ""}
+              value={formData.location}
+              onChange={handleChange}
               placeholder="e.g. Vadodara, Gujarat, India"
-              required
               className="admin-input"
             />
           </div>
@@ -144,8 +191,8 @@ export default function BioFormClient({ bio }: Props) {
                 step="any"
                 id="latitude"
                 name="latitude"
-                defaultValue={bio?.latitude ?? 22.30716}
-                required
+                value={formData.latitude}
+                onChange={handleChange}
                 className="admin-input"
               />
             </div>
@@ -158,8 +205,8 @@ export default function BioFormClient({ bio }: Props) {
                 step="any"
                 id="longitude"
                 name="longitude"
-                defaultValue={bio?.longitude ?? 73.18122}
-                required
+                value={formData.longitude}
+                onChange={handleChange}
                 className="admin-input"
               />
             </div>
@@ -172,7 +219,7 @@ export default function BioFormClient({ bio }: Props) {
           ═══════════════════════════════════════════ */}
       <div className="glass-card" style={{ padding: 28 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-          <span style={{ fontSize: "1.1rem" }}>📖</span>
+          <span style={{ fontSize: "1.2rem" }}>📖</span>
           <div>
             <h2 className="font-display" style={{ fontSize: "1.15rem", fontWeight: 700 }}>
               2. Dedicated Persona &amp; Story Page (`/about`)
@@ -192,7 +239,8 @@ export default function BioFormClient({ bio }: Props) {
               type="text"
               id="statusText"
               name="statusText"
-              defaultValue={bio?.statusText || "Open to Opportunities & Collaborations"}
+              value={formData.statusText}
+              onChange={handleChange}
               placeholder="e.g. Open to Opportunities & Collaborations"
               className="admin-input"
             />
@@ -205,7 +253,8 @@ export default function BioFormClient({ bio }: Props) {
             <textarea
               id="longBio"
               name="longBio"
-              defaultValue={bio?.longBio || ""}
+              value={formData.longBio}
+              onChange={handleChange}
               placeholder="Optional longer introduction for the /about page..."
               rows={4}
               className="admin-input"
@@ -225,7 +274,8 @@ export default function BioFormClient({ bio }: Props) {
               <textarea
                 id="originStory"
                 name="originStory"
-                defaultValue={bio?.originStory || ""}
+                value={formData.originStory}
+                onChange={handleChange}
                 placeholder="How your passion for technology started..."
                 rows={3}
                 className="admin-input"
@@ -239,7 +289,8 @@ export default function BioFormClient({ bio }: Props) {
               <textarea
                 id="currentFocus"
                 name="currentFocus"
-                defaultValue={bio?.currentFocus || ""}
+                value={formData.currentFocus}
+                onChange={handleChange}
                 placeholder="Your current studies, tech stack, and focus areas..."
                 rows={3}
                 className="admin-input"
@@ -253,7 +304,8 @@ export default function BioFormClient({ bio }: Props) {
               <textarea
                 id="philosophy"
                 name="philosophy"
-                defaultValue={bio?.philosophy || ""}
+                value={formData.philosophy}
+                onChange={handleChange}
                 placeholder="Your core software craftsmanship values..."
                 rows={3}
                 className="admin-input"
@@ -268,7 +320,7 @@ export default function BioFormClient({ bio }: Props) {
           ═══════════════════════════════════════════ */}
       <div className="glass-card" style={{ padding: 28 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-          <span style={{ fontSize: "1.1rem" }}>📄</span>
+          <span style={{ fontSize: "1.2rem" }}>📄</span>
           <div>
             <h2 className="font-display" style={{ fontSize: "1.15rem", fontWeight: 700 }}>
               3. Resume &amp; Social Links
@@ -288,7 +340,8 @@ export default function BioFormClient({ bio }: Props) {
               type="text"
               id="resumeUrl"
               name="resumeUrl"
-              defaultValue={bio?.resumeUrl || "/Sai_Inapakolla_Resume.pdf"}
+              value={formData.resumeUrl}
+              onChange={handleChange}
               placeholder="e.g. /Sai_Inapakolla_Resume.pdf or https://drive.google.com/..."
               className="admin-input"
             />
@@ -299,10 +352,11 @@ export default function BioFormClient({ bio }: Props) {
               Contact Email
             </label>
             <input
-              type="email"
+              type="text"
               id="email"
               name="email"
-              defaultValue={bio?.email || "inapakolla.sai1@gmail.com"}
+              value={formData.email}
+              onChange={handleChange}
               placeholder="e.g. inapakolla.sai1@gmail.com"
               className="admin-input"
             />
@@ -313,10 +367,11 @@ export default function BioFormClient({ bio }: Props) {
               GitHub Profile URL
             </label>
             <input
-              type="url"
+              type="text"
               id="githubUrl"
               name="githubUrl"
-              defaultValue={bio?.githubUrl || "https://github.com/Sai-Inapakolla"}
+              value={formData.githubUrl}
+              onChange={handleChange}
               placeholder="https://github.com/..."
               className="admin-input"
             />
@@ -327,10 +382,11 @@ export default function BioFormClient({ bio }: Props) {
               LinkedIn Profile URL
             </label>
             <input
-              type="url"
+              type="text"
               id="linkedinUrl"
               name="linkedinUrl"
-              defaultValue={bio?.linkedinUrl || "https://www.linkedin.com/in/saiinapakolla576/"}
+              value={formData.linkedinUrl}
+              onChange={handleChange}
               placeholder="https://www.linkedin.com/in/..."
               className="admin-input"
             />
@@ -341,10 +397,11 @@ export default function BioFormClient({ bio }: Props) {
               Instagram Profile URL
             </label>
             <input
-              type="url"
+              type="text"
               id="instagramUrl"
               name="instagramUrl"
-              defaultValue={bio?.instagramUrl || "https://www.instagram.com/inapakolla.sai"}
+              value={formData.instagramUrl}
+              onChange={handleChange}
               placeholder="https://www.instagram.com/..."
               className="admin-input"
             />
@@ -352,29 +409,29 @@ export default function BioFormClient({ bio }: Props) {
         </div>
       </div>
 
-      {/* ── Save Action Button with Loading Indicator ── */}
+      {/* ── Submit Action Button ── */}
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 16 }}>
         <button
           type="submit"
-          disabled={isPending}
+          disabled={loading}
           className="pill-btn pill-btn--cyan"
           style={{
-            padding: "14px 36px",
+            padding: "14px 38px",
             fontSize: "0.95rem",
-            opacity: isPending ? 0.7 : 1,
-            cursor: isPending ? "wait" : "pointer",
+            opacity: loading ? 0.7 : 1,
+            cursor: loading ? "wait" : "pointer",
           }}
         >
           <span className="pill-btn-shine" />
-          {isPending ? (
-            <>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="animate-spin" style={{ animation: "spin 1s linear infinite" }}>
+          {loading ? (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: "spin 1s linear infinite" }}>
                 <path d="M21 12a9 9 0 1 1-6.219-8.56" />
               </svg>
               Saving Changes...
-            </>
+            </span>
           ) : (
-            <>Save All Changes</>
+            <span>Save All Changes</span>
           )}
         </button>
       </div>
@@ -399,10 +456,6 @@ export default function BioFormClient({ bio }: Props) {
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-6px); }
-          to { opacity: 1; transform: translateY(0); }
         }
       `}} />
     </form>
