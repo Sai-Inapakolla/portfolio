@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import BioFormClient from "./BioFormClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminBioPage() {
   const bio = await prisma.bio.findFirst();
 

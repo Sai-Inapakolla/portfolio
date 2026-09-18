@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Bio } from "@prisma/client";
 
 interface Props {
@@ -25,6 +25,28 @@ export default function BioFormClient({ bio }: Props) {
     linkedinUrl: bio?.linkedinUrl || "https://www.linkedin.com/in/saiinapakolla576/",
     instagramUrl: bio?.instagramUrl || "https://www.instagram.com/inapakolla.sai",
   });
+
+  useEffect(() => {
+    if (bio) {
+      setFormData({
+        tagline: bio.tagline || "",
+        content: bio.content || "",
+        location: bio.location || "",
+        latitude: bio.latitude ?? 22.30716,
+        longitude: bio.longitude ?? 73.18122,
+        statusText: bio.statusText || "Open to Opportunities & Collaborations",
+        longBio: bio.longBio || "",
+        originStory: bio.originStory || "",
+        currentFocus: bio.currentFocus || "",
+        philosophy: bio.philosophy || "",
+        resumeUrl: bio.resumeUrl || "/Sai_Inapakolla_Resume.pdf",
+        email: bio.email || "inapakolla.sai1@gmail.com",
+        githubUrl: bio.githubUrl || "https://github.com/Sai-Inapakolla",
+        linkedinUrl: bio.linkedinUrl || "https://www.linkedin.com/in/saiinapakolla576/",
+        instagramUrl: bio.instagramUrl || "https://www.instagram.com/inapakolla.sai",
+      });
+    }
+  }, [bio]);
 
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -51,6 +73,26 @@ export default function BioFormClient({ bio }: Props) {
       const data = await res.json();
 
       if (res.ok && data.success) {
+        if (data.bio) {
+          setFormData((prev) => ({
+            ...prev,
+            tagline: data.bio.tagline ?? prev.tagline,
+            content: data.bio.content ?? prev.content,
+            location: data.bio.location ?? prev.location,
+            latitude: data.bio.latitude ?? prev.latitude,
+            longitude: data.bio.longitude ?? prev.longitude,
+            statusText: data.bio.statusText ?? prev.statusText,
+            longBio: data.bio.longBio ?? prev.longBio,
+            originStory: data.bio.originStory ?? prev.originStory,
+            currentFocus: data.bio.currentFocus ?? prev.currentFocus,
+            philosophy: data.bio.philosophy ?? prev.philosophy,
+            resumeUrl: data.bio.resumeUrl ?? prev.resumeUrl,
+            email: data.bio.email ?? prev.email,
+            githubUrl: data.bio.githubUrl ?? prev.githubUrl,
+            linkedinUrl: data.bio.linkedinUrl ?? prev.linkedinUrl,
+            instagramUrl: data.bio.instagramUrl ?? prev.instagramUrl,
+          }));
+        }
         setFeedback({
           type: "success",
           message: "All changes saved successfully!",
@@ -333,9 +375,28 @@ export default function BioFormClient({ bio }: Props) {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <label htmlFor="resumeUrl" style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--text-secondary)" }}>
-              Resume Download Link / Path
-            </label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <label htmlFor="resumeUrl" style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--text-secondary)" }}>
+                Resume Download Link / Path
+              </label>
+              {formData.resumeUrl && (
+                <a
+                  href={formData.resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--cyan)",
+                    textDecoration: "underline",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                >
+                  Test Link ↗
+                </a>
+              )}
+            </div>
             <input
               type="text"
               id="resumeUrl"

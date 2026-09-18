@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 const ROLES = ["DEVELOPER", "ENGINEER", "COLLABORATOR", "LEARNER"];
 
-export default function HeroSection() {
+export default function HeroSection({ resumeUrl }: { resumeUrl?: string }) {
   const [roleIndex, setRoleIndex] = useState(0);
   const [animating, setAnimating] = useState(false);
 
@@ -18,6 +18,9 @@ export default function HeroSection() {
     }, 2800);
     return () => clearInterval(interval);
   }, []);
+
+  const downloadHref = resumeUrl || "/Sai_Inapakolla_Resume.pdf";
+  const isExternal = downloadHref.startsWith("http");
 
   return (
     <section
@@ -173,7 +176,13 @@ export default function HeroSection() {
             flexWrap: "wrap",
           }}
         >
-          <a href="https://drive.google.com/file/d/1kDISAOLHfjuPyAmaFAbOIORu_CgCQ2HT/view?usp=sharing" className="pill-btn pill-btn--cyan">
+          <a
+            href={downloadHref}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
+            download={!isExternal ? "Sai_Inapakolla_Resume.pdf" : undefined}
+            className="pill-btn pill-btn--cyan"
+          >
             <span className="pill-btn-shine" />
             <svg
               width="14"

@@ -2,6 +2,8 @@ import { SKILL_CATEGORIES } from "@/lib/skills";
 import Navbar from "@/components/Navbar";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function SkillsPage() {
   const skills = await prisma.skill.findMany();
   return (

@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { deleteMessageAction } from "./actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminMessagesPage() {
   const messages = await prisma.contactMessage.findMany({
     orderBy: { createdAt: "desc" },

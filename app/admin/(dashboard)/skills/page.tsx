@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { deleteSkillAction } from "./actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminSkillsPage() {
   const skills = await prisma.skill.findMany({
     orderBy: [{ category: "asc" }, { name: "asc" }],

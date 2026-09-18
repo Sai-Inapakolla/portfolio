@@ -9,6 +9,8 @@ export const metadata: Metadata = {
     "Explore Inapakolla Sai's journey, engineering philosophy, timeline, and technical specializations in Full-Stack Web Engineering and AI/ML.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function AboutPage() {
   const bio = await prisma.bio.findFirst();
   const achievements = await prisma.achievement.findMany().catch(() => []);
